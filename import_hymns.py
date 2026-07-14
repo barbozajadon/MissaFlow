@@ -101,8 +101,29 @@ def import_hymns(dry_run: bool = False):
         inserted = 0
         for hymn in hymns:
             exists = session.query(Hymn).filter_by(hymn_number=hymn["number"]).first()
+            exists = session.query(Hymn).filter_by(
+    hymn_number=hymn["number"]
+).first()
+
             if exists:
-                continue
+             exists.title = hymn["title"]
+             exists.lyrics = hymn["lyrics_text"] or None
+             exists.start_slide = hymn["start_slide"]
+             exists.end_slide = hymn["end_slide"]
+             exists.language = "English"
+            else:
+              session.add(
+        Hymn(
+            hymn_number=hymn["number"],
+            title=hymn["title"],
+            lyrics=hymn["lyrics_text"] or None,
+            start_slide=hymn["start_slide"],
+            end_slide=hymn["end_slide"],
+            category=None,
+            language="English",
+        )
+    )
+                
             session.add(
                 Hymn(
                     hymn_number=hymn["number"],
