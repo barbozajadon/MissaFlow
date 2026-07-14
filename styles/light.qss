@@ -1,0 +1,138 @@
+/* Church Hymn Planner - Light theme */
+
+QWidget {
+    background-color: #f7f8fa;
+    color: #1d1f27;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+}
+
+#Sidebar {
+    background-color: #ffffff;
+    border-right: 1px solid #e2e4ea;
+}
+
+#AppTitle {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 0 20px 16px 20px;
+    color: #1d1f27;
+}
+
+#NavList {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+#NavList::item {
+    padding: 12px 20px;
+}
+
+#NavList::item:selected {
+    background-color: #eef1ff;
+    color: #3d55ff;
+    border-left: 3px solid #3d55ff;
+}
+
+#NavList::item:hover:!selected {
+    background-color: #f1f2f6;
+}
+
+#PageTitle {
+    font-size: 22px;
+    font-weight: 600;
+    padding-bottom: 12px;
+}
+
+#DashboardStat {
+    font-size: 15px;
+    padding: 6px 0;
+    color: #4a4d59;
+}
+
+QPushButton {
+    background-color: #eef0f5;
+    border: 1px solid #d9dce4;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #1d1f27;
+}
+
+QPushButton:hover {
+    background-color: #e3e6ee;
+}
+
+QPushButton:pressed {
+    background-color: #d5d8e0;
+}
+
+#PrimaryButton {
+    background-color: #3d55ff;
+    border: 1px solid #3d55ff;
+    color: white;
+    font-weight: 600;
+}
+
+#PrimaryButton:hover {
+    background-color: #5468ff;
+}
+
+QLineEdit, QTextEdit, QComboBox, QDateEdit {
+    background-color: #ffffff;
+    border: 1px solid #d9dce4;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #1d1f27;
+}
+
+QListWidget {
+    background-color: #ffffff;
+    border: 1px solid #e2e4ea;
+    border-radius: 8px;
+}
+
+QListWidget::item {
+    padding: 6px;
+    border-radius: 6px;
+}
+
+QListWidget::item:selected {
+    background-color: #eef1ff;
+}
+
+#HymnCard {
+    background-color: #ffffff;
+    border: 1px solid #e2e4ea;
+    border-radius: 10px;
+}
+
+#SlotLabel {
+    font-weight: 600;
+    color: #6b6f7d;
+}
+
+#HymnLabel {
+    color: #1d1f27;
+}
+
+#PreviewTitle {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#PreviewMeta {
+    color: #6b6f7d;
+    padding-bottom: 8px;
+}
+
+QScrollBar:vertical {
+    background: #f7f8fa;
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background: #d9dce4;
+    border-radius: 5px;
+    min-height: 20px;
+}

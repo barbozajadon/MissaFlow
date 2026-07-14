@@ -1,0 +1,139 @@
+/* Church Hymn Planner - Dark theme */
+
+QWidget {
+    background-color: #1b1e26;
+    color: #e6e6e6;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+}
+
+#Sidebar {
+    background-color: #14161c;
+    border-right: 1px solid #2a2d38;
+}
+
+#AppTitle {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 0 20px 16px 20px;
+    color: #f2f2f2;
+}
+
+#NavList {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+#NavList::item {
+    padding: 12px 20px;
+    border-radius: 0;
+}
+
+#NavList::item:selected {
+    background-color: #2c3040;
+    color: #7aa2ff;
+    border-left: 3px solid #7aa2ff;
+}
+
+#NavList::item:hover:!selected {
+    background-color: #21242e;
+}
+
+#PageTitle {
+    font-size: 22px;
+    font-weight: 600;
+    padding-bottom: 12px;
+}
+
+#DashboardStat {
+    font-size: 15px;
+    padding: 6px 0;
+    color: #c7c9d1;
+}
+
+QPushButton {
+    background-color: #2c3040;
+    border: 1px solid #3a3e50;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #e6e6e6;
+}
+
+QPushButton:hover {
+    background-color: #363b4d;
+}
+
+QPushButton:pressed {
+    background-color: #22252f;
+}
+
+#PrimaryButton {
+    background-color: #5468ff;
+    border: 1px solid #5468ff;
+    color: white;
+    font-weight: 600;
+}
+
+#PrimaryButton:hover {
+    background-color: #6577ff;
+}
+
+QLineEdit, QTextEdit, QComboBox, QDateEdit {
+    background-color: #22252f;
+    border: 1px solid #3a3e50;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #e6e6e6;
+}
+
+QListWidget {
+    background-color: #1b1e26;
+    border: 1px solid #2a2d38;
+    border-radius: 8px;
+}
+
+QListWidget::item {
+    padding: 6px;
+    border-radius: 6px;
+}
+
+QListWidget::item:selected {
+    background-color: #2c3040;
+}
+
+#HymnCard {
+    background-color: #22252f;
+    border: 1px solid #2f3342;
+    border-radius: 10px;
+}
+
+#SlotLabel {
+    font-weight: 600;
+    color: #9aa0b4;
+}
+
+#HymnLabel {
+    color: #e6e6e6;
+}
+
+#PreviewTitle {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#PreviewMeta {
+    color: #9aa0b4;
+    padding-bottom: 8px;
+}
+
+QScrollBar:vertical {
+    background: #1b1e26;
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background: #3a3e50;
+    border-radius: 5px;
+    min-height: 20px;
+}
