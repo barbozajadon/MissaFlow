@@ -69,7 +69,7 @@ class PlannerPage(QWidget):
         self.time_edit.setPlaceholderText("e.g. 10:00 AM")
 
         self.celebrant_edit = QLineEdit()
-        self.celebrant_edit.setPlaceholderText("Celebrant name")
+        self.celebrant_edit.setPlaceholderText("Choir/Choir Master Name:")
 
        
 
@@ -79,7 +79,7 @@ class PlannerPage(QWidget):
 
         form.addRow("Date:", self.date_edit)
         form.addRow("Time:", self.time_edit)
-        form.addRow("Celebrant:", self.celebrant_edit)
+        form.addRow("Choir/Choir Master Name:", self.celebrant_edit)
         form.addRow("Notes:", self.notes_edit)
 
         left.addLayout(form)
