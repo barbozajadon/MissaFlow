@@ -171,7 +171,7 @@ class PlannerPage(QWidget):
 
     def _populate_slots(self) -> None:
         """Create the default Mass slots."""
-
+    
         self.order_list.clear()
         self._cards = {}
 

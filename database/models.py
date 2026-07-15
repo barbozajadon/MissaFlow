@@ -112,6 +112,7 @@ class MassPlan(Base):
 # selecting slot types for a Mass, matching the spec's field list.
 DEFAULT_MASS_SLOTS = [
     "entrance_hymn",
+    "penitential_rite",
     "offertory_hymn",
     "communion_hymn",
     "recessional_hymn",
@@ -120,7 +121,7 @@ DEFAULT_MASS_SLOTS = [
 # Optional slots the user can add
 OPTIONAL_MASS_SLOTS = [
     
-    "penitential_rite",
+    
     "gloria",
     "psalm_response",
     "gospel_acclamation",

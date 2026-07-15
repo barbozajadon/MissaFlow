@@ -42,19 +42,30 @@ def _get_com_app():
         _app.Visible = True
     return _app
 
+FIXED_SLIDES = {
+    "penitential_rite": [2272],
+}
+def build_slide_indices_from_mass_items(items):
 
-def build_slide_indices_from_mass_items(mass_items: list) -> list[int]:
-    """
-    Expand each MassItem's linked hymn start_slide/end_slide into an
-    explicit, ordered list of individual slide numbers (1-indexed) -
-    this is what PowerPoint's NamedSlideShows.Add() needs.
-    """
-    indices: list[int] = []
-    for item in mass_items:
-        hymn = getattr(item, "hymn", None)
-        if hymn and hymn.start_slide and hymn.end_slide:
-            indices.extend(range(hymn.start_slide, hymn.end_slide + 1))
-    return indices
+    slide_indices = []
+
+    for item in items:
+
+        # Fixed slides
+        if item.slot_type in FIXED_SLIDES:
+            slide_indices.extend(FIXED_SLIDES[item.slot_type])
+            continue
+
+        # Hymns selected by the user
+        if item.hymn and item.hymn.start_slide and item.hymn.end_slide:
+            slide_indices.extend(
+                range(
+                    item.hymn.start_slide,
+                    item.hymn.end_slide + 1
+                )
+            )
+
+    return slide_indices
 
 
 def present(master_pptx_path: str, slide_indices: list[int]) -> None:
