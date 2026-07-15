@@ -49,14 +49,23 @@ def import_hymns(dry_run: bool = False):
         match = TITLE_PATTERN.match(first_line)
 
         if match:
-            # Finish previous hymn before starting this one
-            if current:
-                current["end_slide"] = slide_number - 1
-                hymns.append(current)
-
             hymn_number = match.group(1).strip()
             title = match.group(2).strip()
             remaining_lines = lines[1:]  # rest of this slide's text is lyrics too
+
+            if current and hymn_number == current["number"]:
+                # Same hymn number as the slide before - this is the header
+                # repeating on a later slide of the SAME hymn (e.g. every
+                # verse's slide re-shows "141 - Title"), not a new hymn.
+                # Extend the current hymn instead of starting a new one.
+                current["end_slide"] = slide_number
+                current["lyrics_lines"].extend(remaining_lines)
+                continue
+
+            # Finish previous hymn before starting this new one
+            if current:
+                current["end_slide"] = slide_number - 1
+                hymns.append(current)
 
             current = {
                 "number": hymn_number,
@@ -98,32 +107,13 @@ def import_hymns(dry_run: bool = False):
     # Save into database
     # ----------------------------------------------------------------
     with get_session() as session:
+        existing_numbers = {h.hymn_number for h in session.query(Hymn.hymn_number).all()}
         inserted = 0
+        skipped = 0
         for hymn in hymns:
-            exists = session.query(Hymn).filter_by(hymn_number=hymn["number"]).first()
-            exists = session.query(Hymn).filter_by(
-    hymn_number=hymn["number"]
-).first()
-
-            if exists:
-             exists.title = hymn["title"]
-             exists.lyrics = hymn["lyrics_text"] or None
-             exists.start_slide = hymn["start_slide"]
-             exists.end_slide = hymn["end_slide"]
-             exists.language = "English"
-            else:
-              session.add(
-        Hymn(
-            hymn_number=hymn["number"],
-            title=hymn["title"],
-            lyrics=hymn["lyrics_text"] or None,
-            start_slide=hymn["start_slide"],
-            end_slide=hymn["end_slide"],
-            category=None,
-            language="English",
-        )
-    )
-                
+            if hymn["number"] in existing_numbers:
+                skipped += 1
+                continue
             session.add(
                 Hymn(
                     hymn_number=hymn["number"],
@@ -135,10 +125,11 @@ def import_hymns(dry_run: bool = False):
                     language="English",
                 )
             )
+            existing_numbers.add(hymn["number"])  # so later duplicates in this same run are caught too
             inserted += 1
         session.commit()
 
-    print(f"Imported {inserted} new hymn(s) out of {len(hymns)} found.")
+    print(f"Imported {inserted} new hymn(s), skipped {skipped} already-existing, out of {len(hymns)} found.")
 
 
 if __name__ == "__main__":

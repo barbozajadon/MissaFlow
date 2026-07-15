@@ -58,7 +58,7 @@ class DashboardPage(QWidget):
         new_mass_btn.clicked.connect(lambda: self._on_new_mass and self._on_new_mass())
         open_prev_btn = QPushButton("Open Previous")
         open_prev_btn.clicked.connect(lambda: self._on_open_previous and self._on_open_previous())
-        generate_btn = QPushButton("Generate Presentation")
+        generate_btn = QPushButton("Present on Screen")
         generate_btn.setObjectName("PrimaryButton")
         generate_btn.clicked.connect(lambda: self._on_generate and self._on_generate())
 
@@ -82,11 +82,8 @@ class DashboardPage(QWidget):
         else:
             self.next_mass_label.setText("Next scheduled Mass: none planned yet")
 
-        plans = mass_plan_service.get_all_mass_plans()
-        last_generated = next((p for p in plans if p.generated_presentation_path), None)
-        if last_generated:
-            self.last_generated_label.setText(
-                f"Last generated presentation: {last_generated.generated_presentation_path}"
-            )
-        else:
-            self.last_generated_label.setText("Last generated presentation: none yet")
+        # Presentations now run in-app via PowerPoint COM (see present_service.py)
+        # rather than being exported to a file, so there's no file path to show
+        # here anymore - this label is left as a placeholder for a future
+        # "last presented on" timestamp if that's ever tracked.
+        self.last_generated_label.setText("")
