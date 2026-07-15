@@ -11,6 +11,7 @@ on the Planner page, including any real transitions/animations.
 from __future__ import annotations
 
 import logging
+import os
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -67,8 +68,21 @@ def present(master_pptx_path: str, slide_indices: list[int]) -> None:
     if not slide_indices:
         raise ValueError("No slides to present - assign hymns to at least one slot first.")
 
+    # PowerPoint's COM Presentations.Open() does NOT reliably resolve
+    # relative paths the way Python does - it uses PowerPoint's own
+    # working directory, not the script's, so a relative path here
+    # (e.g. "assets/hymnal.pptx") can fail with a cryptic
+    # "file not found" COM error even though the file exists. Always
+    # resolve to an absolute path first.
+    abs_path = os.path.abspath(master_pptx_path)
+    if not os.path.isfile(abs_path):
+        raise FileNotFoundError(
+            f"Master PowerPoint not found at: {abs_path}\n"
+            f"Check the 'Master PowerPoint' path in Settings."
+        )
+
     app = _get_com_app()
-    presentation = app.Presentations.Open(master_pptx_path, WithWindow=True)
+    presentation = app.Presentations.Open(abs_path, WithWindow=True)
     _presentation = presentation
 
     # Remove any previous custom show with the same name before re-adding,
