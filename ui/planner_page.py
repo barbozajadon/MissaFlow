@@ -69,7 +69,7 @@ class PlannerPage(QWidget):
         self.time_edit.setPlaceholderText("e.g. 10:00 AM")
 
         self.celebrant_edit = QLineEdit()
-        self.celebrant_edit.setPlaceholderText("Choir/Choir Master Name:")
+        self.celebrant_edit.setPlaceholderText("Choir/Choir Master Name")
 
        
 
