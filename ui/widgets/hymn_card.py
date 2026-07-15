@@ -61,6 +61,7 @@ class HymnCard(QWidget):
 
         self.slot_label = QLabel(SLOT_LABELS.get(self.slot_type, self.slot_type))
         self.slot_label.setObjectName("SlotLabel")
+        self.slot_label.setAlignment(Qt.AlignCenter)
 
         self.hymn_label = QLabel("not selected")
         self.hymn_label.setAlignment(Qt.AlignCenter)
