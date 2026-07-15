@@ -85,6 +85,22 @@ def present(master_pptx_path: str, slide_indices: list[int]) -> None:
     presentation = app.Presentations.Open(abs_path, WithWindow=True)
     _presentation = presentation
 
+    # IMPORTANT: NamedSlideShows.Add() takes each slide's permanent SlideID,
+    # NOT its position/index in the deck. These are different things - a
+    # slide's position can change if slides are reordered, but its SlideID
+    # never does. Passing positions directly (as if they were IDs) causes
+    # PowerPoint to silently show the wrong slides. Convert first.
+    slide_ids = []
+    for position in slide_indices:
+        try:
+            slide_ids.append(presentation.Slides(position).SlideID)
+        except Exception as exc:
+            raise ValueError(
+                f"Slide position {position} does not exist in this presentation "
+                f"(it only has {presentation.Slides.Count} slides) - the imported "
+                f"start_slide/end_slide values may be stale. Re-run import_hymns.py."
+            ) from exc
+
     # Remove any previous custom show with the same name before re-adding,
     # so re-running Present after changing the order doesn't stack up
     # stale named shows inside the same PowerPoint file.
@@ -93,7 +109,7 @@ def present(master_pptx_path: str, slide_indices: list[int]) -> None:
         if named_shows.Item(i).Name == CUSTOM_SHOW_NAME:
             named_shows.Item(i).Delete()
 
-    named_shows.Add(CUSTOM_SHOW_NAME, slide_indices)
+    named_shows.Add(CUSTOM_SHOW_NAME, slide_ids)
 
     settings = presentation.SlideShowSettings
     settings.RangeType = PP_SHOW_NAMED_SLIDE_SHOW
