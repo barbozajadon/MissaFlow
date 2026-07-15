@@ -34,7 +34,7 @@ from database.models import (
     DEFAULT_MASS_SLOTS,
     OPTIONAL_MASS_SLOTS,
 )
-from services import calendar_service, hymn_service, mass_plan_service, present_service, settings_service
+from services import hymn_service, mass_plan_service, present_service, settings_service
 from ui.search_dialog import SearchDialog
 from ui.widgets.hymn_card import SLOT_LABELS, HymnCard
 
@@ -49,7 +49,7 @@ class PlannerPage(QWidget):
         self.current_plan_id: Optional[int] = None
         self._build_ui()
         self._populate_slots()
-        self._on_date_changed()
+       
 
     # -- UI construction -----------------------------------------------
 
@@ -63,7 +63,7 @@ class PlannerPage(QWidget):
         self.date_edit = QDateEdit()
         self.date_edit.setCalendarPopup(True)
         self.date_edit.setDate(datetime.date.today())
-        self.date_edit.dateChanged.connect(self._on_date_changed)
+        
 
         self.time_edit = QLineEdit()
         self.time_edit.setPlaceholderText("e.g. 10:00 AM")
@@ -71,9 +71,7 @@ class PlannerPage(QWidget):
         self.celebrant_edit = QLineEdit()
         self.celebrant_edit.setPlaceholderText("Celebrant name")
 
-        self.season_label = QLabel("—")
-        self.psalm_label = QLabel("—")
-        self.gospel_accl_label = QLabel("—")
+       
 
         self.notes_edit = QTextEdit()
         self.notes_edit.setPlaceholderText("Notes for this Mass...")
@@ -82,9 +80,6 @@ class PlannerPage(QWidget):
         form.addRow("Date:", self.date_edit)
         form.addRow("Time:", self.time_edit)
         form.addRow("Celebrant:", self.celebrant_edit)
-        form.addRow("Liturgical Season:", self.season_label)
-        form.addRow("Psalm:", self.psalm_label)
-        form.addRow("Gospel Acclamation:", self.gospel_accl_label)
         form.addRow("Notes:", self.notes_edit)
 
         left.addLayout(form)
@@ -196,17 +191,6 @@ class PlannerPage(QWidget):
 
     # -- Behavior -----------------------------------------------------
 
-    def _on_date_changed(self) -> None:
-        mass_date = self.date_edit.date().toPython()
-        entry = calendar_service.get_by_date(mass_date)
-        if entry:
-            self.season_label.setText(entry.season)
-            self.psalm_label.setText(entry.psalm or "—")
-            self.gospel_accl_label.setText(entry.gospel_acclamation or "—")
-        else:
-            self.season_label.setText("(no calendar entry - add one in Settings/sample data)")
-            self.psalm_label.setText("—")
-            self.gospel_accl_label.setText("—")
 
     def _open_search_for_slot(self, slot_type: str) -> None:
         dialog = SearchDialog(self, title=f"Select hymn for: {SLOT_LABELS.get(slot_type, slot_type)}")
@@ -234,7 +218,7 @@ class PlannerPage(QWidget):
 
     def _save_plan(self) -> Optional[int]:
         mass_date = self.date_edit.date().toPython()
-        entry = calendar_service.get_by_date(mass_date)
+    
 
         if self.current_plan_id is None:
             plan = mass_plan_service.create_mass_plan(
@@ -242,7 +226,7 @@ class PlannerPage(QWidget):
                 time=self.time_edit.text().strip() or None,
                 celebrant=self.celebrant_edit.text().strip() or None,
                 notes=self.notes_edit.toPlainText().strip() or None,
-                liturgical_calendar_id=entry.id if entry else None,
+                liturgical_calendar_id=None,
             )
             self.current_plan_id = plan.id
         else:

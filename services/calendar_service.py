@@ -3,7 +3,8 @@ Business logic for the liturgical calendar - looking up season/psalm/etc.
 for a given Mass date, used to auto-populate the Mass Planner page.
 """
 from __future__ import annotations
-
+import requests 
+import xml.etree.ElementTree as ET
 import datetime
 import logging
 from typing import Optional
@@ -13,16 +14,20 @@ from sqlalchemy import select
 from database.database import get_session
 from database.models import LiturgicalCalendar
 
+
 logger = logging.getLogger(__name__)
+
+
 
 
 def get_by_date(mass_date: datetime.date) -> Optional[LiturgicalCalendar]:
     with get_session() as session:
         return session.scalar(
-            select(LiturgicalCalendar).where(LiturgicalCalendar.date == mass_date)
+            select(LiturgicalCalendar).where(
+                LiturgicalCalendar.date == mass_date
+            )
         )
-
-
+    
 def upsert_entry(
     mass_date: datetime.date,
     season: str,
@@ -84,3 +89,7 @@ def get_upcoming_dates(limit: int = 10) -> list[LiturgicalCalendar]:
             .limit(limit)
         )
         return list(session.scalars(stmt).all())
+
+
+
+

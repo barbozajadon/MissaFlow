@@ -73,6 +73,12 @@ class LiturgicalCalendar(Base):
     gloria_required: Mapped[bool] = mapped_column(Boolean, default=True)
     creed_required: Mapped[bool] = mapped_column(Boolean, default=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    first_reading: Mapped[Optional[str]] = mapped_column(String(255))
+    second_reading: Mapped[Optional[str]] = mapped_column(String(255))
+    gospel: Mapped[Optional[str]] = mapped_column(String(255))
+    liturgical_colour: Mapped[Optional[str]] = mapped_column(String(30))
+    responsorial_psalm: Mapped[Optional[str]] = mapped_column(String(255))
+    alleluia: Mapped[Optional[str]] = mapped_column(String(255))
 
 
 class MassPlan(Base):

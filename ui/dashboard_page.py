@@ -71,7 +71,7 @@ class DashboardPage(QWidget):
     def refresh(self) -> None:
         today = datetime.date.today()
         self.date_label.setText(f"Today: {today.strftime('%A, %B %d, %Y')}")
-        self.season_label.setText(f"Liturgical season: {calendar_service.get_current_season(today)}")
+        
 
         next_mass = mass_plan_service.get_next_scheduled_mass()
         if next_mass:
