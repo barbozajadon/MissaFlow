@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal , Qt
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -24,11 +24,11 @@ SLOT_LABELS = {
     "penitential_rite": "Penitential Rite",
     "gloria": "Gloria",
     "responsorial_psalm": "Responsorial Psalm",
-    "gospel_acclamation": "Gospel Acclamation",
     "creed": "Creed",
+    "gospel_acclamation": "Gospel Acclamation",
     "offertory_hymn": "Offertory Hymn",
     "holy": "Holy",
-    "memorial_acclamation": "Memorial Acclamation",
+    "proclaimation": "Proclaimation",
     "great_amen": "Great Amen",
     "lamb_of_god": "Lamb of God",
     "communion_hymn": "Communion Hymn",
@@ -62,7 +62,8 @@ class HymnCard(QWidget):
         self.slot_label = QLabel(SLOT_LABELS.get(self.slot_type, self.slot_type))
         self.slot_label.setObjectName("SlotLabel")
 
-        self.hymn_label = QLabel("— not selected —")
+        self.hymn_label = QLabel("not selected")
+        self.hymn_label.setAlignment(Qt.AlignCenter)
         self.hymn_label.setObjectName("HymnLabel")
 
         self.select_button = QPushButton("Select")
@@ -71,15 +72,15 @@ class HymnCard(QWidget):
             lambda: self.search_requested.emit(self.slot_type)
         )
 
-        self.remove_button = QPushButton("✕")
-        self.remove_button.setFixedWidth(28)
+        self.remove_button = QPushButton("❌")
+        self.remove_button.setStyleSheet("font-family : Segoe UI emoji;")
         self.remove_button.setObjectName("RemoveButton")
         self.remove_button.clicked.connect(
             lambda: self.remove_requested.emit(self.slot_type)
         )
 
         row.addWidget(self.slot_label, 2)
-        row.addWidget(self.hymn_label, 4)
+        row.addWidget(self.hymn_label, 3)
         row.addWidget(self.select_button)
         row.addWidget(self.remove_button)
 

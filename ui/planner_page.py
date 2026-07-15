@@ -12,7 +12,7 @@ import datetime
 import logging
 from typing import Optional
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt , QSize
 from PySide6.QtWidgets import (
     QDateEdit,
     QFormLayout,
@@ -26,9 +26,14 @@ from PySide6.QtWidgets import (
     QTextEdit,
     QVBoxLayout,
     QWidget,
+    QInputDialog,
+    QAbstractItemView,
 )
 
-from database.models import MASS_SLOT_TYPES
+from database.models import (
+    DEFAULT_MASS_SLOTS,
+    OPTIONAL_MASS_SLOTS,
+)
 from services import calendar_service, hymn_service, mass_plan_service, present_service, settings_service
 from ui.search_dialog import SearchDialog
 from ui.widgets.hymn_card import SLOT_LABELS, HymnCard
@@ -105,17 +110,77 @@ class PlannerPage(QWidget):
         right.addWidget(QLabel("Mass Order (drag to reorder)"))
 
         self.order_list = QListWidget()
-        self.order_list.setDragDropMode(QListWidget.InternalMove)
-        self.order_list.setSelectionMode(QListWidget.NoSelection)
         right.addWidget(self.order_list, 1)
+        self.order_list.setDragDropMode(QAbstractItemView.InternalMove)
+        self.order_list.setDefaultDropAction(Qt.MoveAction)
+        self.order_list.setDragEnabled(True)
+        self.order_list.setAcceptDrops(True)
+        self.order_list.setDropIndicatorShown(True)
+        self.order_list.setSelectionMode(QAbstractItemView.SingleSelection)
 
         root.addLayout(right, 3)
 
+        self.add_part_button = QPushButton("Add Mass Part")
+        self.add_part_button.clicked.connect(self._add_optional_part)
+
+        button_row.addWidget(self.add_part_button)
+
+    from PySide6.QtWidgets import QInputDialog
+
+    def _add_optional_part(self):
+
+        available = [
+            slot
+            for slot in OPTIONAL_MASS_SLOTS
+            if slot not in self._cards
+        ]
+
+        if not available:
+            QMessageBox.information(
+                self,
+                "No More Parts",
+                "All optional Mass parts have already been added."
+            )
+            return
+
+        slot, ok = QInputDialog.getItem(
+            self,
+            "Add Mass Part",
+            "Choose a Mass Part:",
+            available,
+            editable=False,
+        )
+
+        if ok:
+            self._add_card(slot)
+
+    def _clear_slot(self, slot_type: str):
+
+        if slot_type in OPTIONAL_MASS_SLOTS:
+
+            card = self._cards.pop(slot_type)
+
+            for i in range(self.order_list.count()):
+
+                item = self.order_list.item(i)
+
+                if self.order_list.itemWidget(item) == card:
+
+                    self.order_list.takeItem(i)
+
+                    break
+
+        else:
+            self._cards[slot_type].set_hymn(None, None)
+            
+
     def _populate_slots(self) -> None:
-        """Create one draggable card per fixed Mass slot type."""
+        """Create the default Mass slots."""
+
         self.order_list.clear()
-        self._cards: dict[str, HymnCard] = {}
-        for slot_type in MASS_SLOT_TYPES:
+        self._cards = {}
+
+        for slot_type in DEFAULT_MASS_SLOTS:
             self._add_card(slot_type)
 
     def _add_card(self, slot_type: str) -> None:
@@ -124,7 +189,7 @@ class PlannerPage(QWidget):
         card.remove_requested.connect(self._clear_slot)
 
         item = QListWidgetItem(self.order_list)
-        item.setSizeHint(card.sizeHint())
+        item.setSizeHint(QSize(card.sizeHint().width(), 65))
         self.order_list.addItem(item)
         self.order_list.setItemWidget(item, card)
         self._cards[slot_type] = card

@@ -25,13 +25,13 @@ def configure_logging() -> None:
 def main() -> int:
     configure_logging()
     logger = logging.getLogger(__name__)
-    logger.info("Starting Church Hymn Planner")
+    logger.info("Starting MissaFlow")
 
     init_db()
 
     app = QApplication(sys.argv)
-    app.setApplicationName("Church Hymn Planner")
-
+    app.setApplicationName("MissaFlow")
+    
     window = MainWindow()
     window.show()
 

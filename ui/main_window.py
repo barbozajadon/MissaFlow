@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon , QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -36,7 +37,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Church Hymn Planner")
+        self.setWindowTitle("MissaFlow")
+        self.setWindowIcon(QIcon("C:/Users/Admin/Desktop/MissaFlow/assets/icons/app_icon.PNG"))
+
         self.resize(1200, 780)
 
         self._build_ui()
@@ -57,9 +60,20 @@ class MainWindow(QMainWindow):
         sidebar_layout = QVBoxLayout(sidebar)
         sidebar_layout.setContentsMargins(0, 20, 0, 20)
 
-        app_title = QLabel("⛪  Hymn Planner")
-        app_title.setObjectName("AppTitle")
+        app_title = QLabel()
+        pixmap = QPixmap("assets/icons/app_logo.png")   # Path to your image
+        app_title.setPixmap(pixmap)
         sidebar_layout.addWidget(app_title)
+        pixmap = QPixmap("assets/icons/app_logo.png")
+        app_title.setPixmap(
+        pixmap.scaled(
+        180,          # width
+        60,           # height
+        Qt.KeepAspectRatio,
+        Qt.SmoothTransformation
+    )
+)
+        app_title.setAlignment(Qt.AlignCenter)
 
         self.nav_list = QListWidget()
         self.nav_list.setObjectName("NavList")

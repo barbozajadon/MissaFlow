@@ -103,24 +103,28 @@ class MassPlan(Base):
         return f"<MassPlan {self.date}>"
 
 
-# Fixed slot types for a Mass, matching the spec's field list.
-MASS_SLOT_TYPES = [
+# selecting slot types for a Mass, matching the spec's field list.
+DEFAULT_MASS_SLOTS = [
     "entrance_hymn",
-    "penitential_rite",
-    "gloria",
-    "responsorial_psalm",
-    "psalm_response",
-    "gospel_acclamation",
     "offertory_hymn",
-    "holy",
-    "memorial_acclamation",
-    "great_amen",
-    "lamb_of_god",
     "communion_hymn",
-    "meditation_hymn",
     "recessional_hymn",
 ]
 
+# Optional slots the user can add
+OPTIONAL_MASS_SLOTS = [
+    
+    "penitential_rite",
+    "gloria",
+    "psalm_response",
+    "gospel_acclamation",
+    "creed",
+    "holy",
+    "proclaimation",
+    "great_amen",
+    "lamb_of_god",
+    "meditation_hymn",
+]
 
 class MassItem(Base):
     """One slot (entrance, gloria, communion, etc.) within a MassPlan."""
