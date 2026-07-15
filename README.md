@@ -1,4 +1,4 @@
-# Church Hymn Planner
+# MissaFlow
 
 A desktop app for a parish music ministry to plan the hymns and Mass parts
 for each Mass, and generate the final projection PowerPoint automatically
