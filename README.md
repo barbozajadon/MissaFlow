@@ -1,4 +1,4 @@
-# MissaFlow
+# Church Hymn Planner
 
 A desktop app for a parish music ministry to plan the hymns and Mass parts
 for each Mass, and generate the final projection PowerPoint automatically
@@ -57,7 +57,9 @@ church_hymn_planner/
 │   ├── calendar_service.py      Liturgical calendar lookup/auto-population
 │   ├── search_service.py        Search dialog orchestration (wraps hymn_service)
 │   ├── mass_plan_service.py     MassPlan/MassItem CRUD, duplication
-│   ├── ppt_service.py           Copies slide ranges from the master deck into a new .pptx
+│   ├── present_service.py       Runs the slideshow in-app via PowerPoint COM (primary path)
+│   ├── ppt_service.py           (legacy) copies slide ranges into a new .pptx file - not
+│   │                             called from the UI anymore, kept for optional file export
 │   └── settings_service.py      Key/value app settings persistence
 ├── ui/
 │   ├── main_window.py            Sidebar + page navigation
@@ -79,21 +81,30 @@ church_hymn_planner/
 └── database.db                    SQLite database (created automatically on first run)
 ```
 
-## How presentation generation works
+## How presenting works
+
+The app no longer exports a new .pptx file. Instead, **Present on Screen**
+drives PowerPoint directly via COM automation (Windows + PowerPoint
+required, `pywin32` package):
 
 1. In the Mass Planner, assign a hymn to each slot (Entrance, Communion,
    Recessional, etc.) via the Search dialog, and reorder the cards by
    dragging them.
-2. Click **Generate Presentation**. The app reads each selected hymn's
-   `start_slide`/`end_slide`, copies those exact slides out of
-   `master_hymnal.pptx` (preserving text formatting, images, and
-   backgrounds), and assembles them in your chosen order into
-   `generated_presentations/YYYY-MM-DD_Mass.pptx`.
-3. Fixed spoken/sung parts (Gloria, Holy, Psalm Response, etc.) currently
+2. Click **Present on Screen**. The app opens `master_hymnal.pptx`
+   directly in PowerPoint, builds a temporary Custom Show containing
+   only your selected slides in your chosen order, and starts the
+   slideshow - full fidelity, since it's the real file running in real
+   PowerPoint, not a copy.
+3. Click **Stop Presenting** to end the slideshow and close the file.
+4. Fixed spoken/sung parts (Gloria, Holy, Psalm Response, etc.) currently
    populate from the Liturgical Calendar as text fields on the Planner
    page. If you also want those projected as slides, add them to
    `master_hymnal.pptx` as their own "hymn" entries with a slide range,
    the same way a regular hymn works.
+
+`services/ppt_service.py` (the old file-export approach) is still in the
+project but no longer called from the UI - kept in case you want a
+downloadable/emailable copy of a Mass's slides in the future.
 
 ## What's implemented vs. stretch goals
 

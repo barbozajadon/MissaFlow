@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
 )
 
 from database.models import MASS_SLOT_TYPES
-from services import calendar_service, hymn_service, mass_plan_service, ppt_service, settings_service
+from services import calendar_service, hymn_service, mass_plan_service, present_service, settings_service
 from ui.search_dialog import SearchDialog
 from ui.widgets.hymn_card import SLOT_LABELS, HymnCard
 
@@ -87,11 +87,14 @@ class PlannerPage(QWidget):
         button_row = QHBoxLayout()
         self.save_button = QPushButton("Save Mass Plan")
         self.save_button.clicked.connect(self._save_plan)
-        self.generate_button = QPushButton("Generate Presentation")
-        self.generate_button.setObjectName("PrimaryButton")
-        self.generate_button.clicked.connect(self._generate_presentation)
+        self.present_button = QPushButton("Present on Screen")
+        self.present_button.setObjectName("PrimaryButton")
+        self.present_button.clicked.connect(self._present_on_screen)
+        self.stop_button = QPushButton("Stop Presenting")
+        self.stop_button.clicked.connect(self._stop_presenting)
         button_row.addWidget(self.save_button)
-        button_row.addWidget(self.generate_button)
+        button_row.addWidget(self.present_button)
+        button_row.addWidget(self.stop_button)
         left.addLayout(button_row)
         left.addStretch()
 
@@ -203,35 +206,32 @@ class PlannerPage(QWidget):
                     hymn.id, f"#{hymn.hymn_number or '—'}  {hymn.title}"
                 )
 
-    def _generate_presentation(self) -> None:
+    def _present_on_screen(self) -> None:
         plan_id = self._save_plan()
         if not plan_id:
             return
 
         plan = mass_plan_service.get_mass_plan(plan_id)
-        slide_ranges = ppt_service.build_slide_ranges_from_mass_items(plan.items)
+        slide_indices = present_service.build_slide_indices_from_mass_items(plan.items)
 
-        if not slide_ranges:
+        if not slide_indices:
             QMessageBox.warning(
-                self, "Nothing to generate",
+                self, "Nothing to present",
                 "No selected hymns have slide ranges. Assign hymns to at least one slot first."
             )
             return
 
         master_path = settings_service.get_setting("master_pptx_path")
-        output_dir = settings_service.get_setting("presentation_folder")
 
         try:
-            output_path = ppt_service.generate_presentation(
-                master_pptx_path=master_path,
-                slide_ranges=slide_ranges,
-                mass_date=plan.date,
-                output_dir=output_dir,
-            )
+            present_service.present(master_path, slide_indices)
         except Exception as exc:
-            logger.exception("Presentation generation failed")
-            QMessageBox.critical(self, "Generation failed", str(exc))
-            return
+            logger.exception("Presentation failed to start")
+            QMessageBox.critical(self, "Presentation failed", str(exc))
 
-        mass_plan_service.set_generated_presentation_path(plan_id, output_path)
-        QMessageBox.information(self, "Presentation generated", f"Saved to:\n{output_path}")
+    def _stop_presenting(self) -> None:
+        try:
+            present_service.stop_presentation()
+        except Exception as exc:
+            logger.exception("Failed to stop presentation")
+            QMessageBox.critical(self, "Error", str(exc))
