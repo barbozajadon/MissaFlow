@@ -18,17 +18,33 @@ TITLE_PATTERN = re.compile(r"^\s*(\d+)\s*-\s*(.+)$")
 
 
 # -------------------------------------------------
-# Read all text from a slide, line by line
+# Read a slide's text, separating out the header line (if present)
+# from the rest of the lyric lines.
+#
+# IMPORTANT: the header ("15 - A Lamp For Our Steps") is NOT reliably
+# the first line of text on its slide - it lives in its own text box,
+# and shape order on the slide doesn't match visual/reading order (the
+# lyrics text box can come before the title box in the shape list).
+# So every shape's every line is checked for the header pattern, not
+# just the first line of the slide.
 # -------------------------------------------------
-def get_slide_lines(slide):
-    lines = []
+def find_title_and_lyrics(slide):
+    title_match = None
+    lyrics_lines = []
     for shape in slide.shapes:
-        if hasattr(shape, "text") and shape.text.strip():
-            for line in shape.text.split("\n"):
-                line = line.strip()
-                if line:
-                    lines.append(line)
-    return lines
+        if not hasattr(shape, "text") or not shape.text.strip():
+            continue
+        for line in shape.text.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            if title_match is None:
+                match = TITLE_PATTERN.match(line)
+                if match:
+                    title_match = match
+                    continue  # the header line itself isn't lyrics
+            lyrics_lines.append(line)
+    return title_match, lyrics_lines
 
 
 # -------------------------------------------------
@@ -44,22 +60,19 @@ def import_hymns(dry_run: bool = False):
 
     for index, slide in enumerate(prs.slides):
         slide_number = index + 1
-        lines = get_slide_lines(slide)
-        first_line = lines[0] if lines else ""
-        match = TITLE_PATTERN.match(first_line)
+        title_match, lines = find_title_and_lyrics(slide)
 
-        if match:
-            hymn_number = match.group(1).strip()
-            title = match.group(2).strip()
-            remaining_lines = lines[1:]  # rest of this slide's text is lyrics too
+        if title_match:
+            hymn_number = title_match.group(1).strip()
+            title = title_match.group(2).strip()
 
             if current and hymn_number == current["number"]:
-                # Same hymn number as the slide before - this is the header
-                # repeating on a later slide of the SAME hymn (e.g. every
-                # verse's slide re-shows "141 - Title"), not a new hymn.
-                # Extend the current hymn instead of starting a new one.
+                # Same hymn number as before - this is a repeated
+                # refrain/response section within the SAME hymn (some
+                # hymns re-show their header at each repeat), not a new
+                # hymn. Extend the current entry instead of splitting it.
                 current["end_slide"] = slide_number
-                current["lyrics_lines"].extend(remaining_lines)
+                current["lyrics_lines"].extend(lines)
                 continue
 
             # Finish previous hymn before starting this new one
@@ -72,13 +85,17 @@ def import_hymns(dry_run: bool = False):
                 "title": title,
                 "start_slide": slide_number,
                 "end_slide": slide_number,
-                "lyrics_lines": remaining_lines,
+                "lyrics_lines": lines,
             }
         else:
-            # Continuation slide - append its text as more lyrics for the
+            # Continuation slide (no header) - more lyrics for the
             # current hymn
             if current:
                 current["lyrics_lines"].extend(lines)
+                current["end_slide"] = slide_number
+            else:
+                print(f"[WARN] Slide {slide_number} has no title and no current "
+                      f"hymn context - skipping.")
 
     # Finish last hymn
     if current:
