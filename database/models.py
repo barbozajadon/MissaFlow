@@ -34,7 +34,13 @@ class Base(DeclarativeBase):
 
 
 class Hymn(Base):
-    """A single hymn/song entry sourced from master_hymnal.pptx."""
+    """
+    A single hymn or slide-based item (hymn, psalm response, Gloria, etc.)
+    sourced from a PPTX file. Despite the name, this table now holds any
+    slide-based content, distinguished by `category` (e.g. 'hymn',
+    'psalm_response', 'gloria', 'holy', 'gospel_acclamation') - reusing
+    the same search/select/present machinery for all of them.
+    """
 
     __tablename__ = "hymns"
 
@@ -45,6 +51,10 @@ class Hymn(Base):
     category: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)
     language: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, default="English")
     tags: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)  # comma-separated
+    source_file: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    # Path to the PPTX this entry's slides live in. NULL means "the
+    # default master hymnal" (see settings_service master_pptx_path) -
+    # this keeps every existing hymn row valid without a migration.
     start_slide: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     end_slide: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
@@ -69,16 +79,18 @@ class LiturgicalCalendar(Base):
     feast_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     psalm: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     psalm_response: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    psalm_response_hymn_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("hymns.id", ondelete="SET NULL"), nullable=True
+    )
+    # Points at the Hymn row (category='psalm_response') holding this
+    # date's actual projectable slide, so the Planner can auto-fill the
+    # slot with a real slide, not just display text.
     gospel_acclamation: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     gloria_required: Mapped[bool] = mapped_column(Boolean, default=True)
     creed_required: Mapped[bool] = mapped_column(Boolean, default=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    first_reading: Mapped[Optional[str]] = mapped_column(String(255))
-    second_reading: Mapped[Optional[str]] = mapped_column(String(255))
-    gospel: Mapped[Optional[str]] = mapped_column(String(255))
-    liturgical_colour: Mapped[Optional[str]] = mapped_column(String(30))
-    responsorial_psalm: Mapped[Optional[str]] = mapped_column(String(255))
-    alleluia: Mapped[Optional[str]] = mapped_column(String(255))
+
+    psalm_response_hymn: Mapped[Optional["Hymn"]] = relationship()
 
 
 class MassPlan(Base):
@@ -109,29 +121,24 @@ class MassPlan(Base):
         return f"<MassPlan {self.date}>"
 
 
-# selecting slot types for a Mass, matching the spec's field list.
-DEFAULT_MASS_SLOTS = [
+# Fixed slot types for a Mass, matching the spec's field list.
+MASS_SLOT_TYPES = [
     "entrance_hymn",
     "penitential_rite",
+    "gloria",
+    "responsorial_psalm",
+    "psalm_response",
+    "gospel_acclamation",
     "offertory_hymn",
+    "holy",
+    "memorial_acclamation",
+    "great_amen",
+    "lamb_of_god",
     "communion_hymn",
+    "meditation_hymn",
     "recessional_hymn",
 ]
 
-# Optional slots the user can add
-OPTIONAL_MASS_SLOTS = [
-    
-    
-    "gloria",
-    "psalm_response",
-    "gospel_acclamation",
-    "creed",
-    "holy",
-    "proclaimation",
-    "great_amen",
-    "lamb_of_god",
-    "meditation_hymn",
-]
 
 class MassItem(Base):
     """One slot (entrance, gloria, communion, etc.) within a MassPlan."""
