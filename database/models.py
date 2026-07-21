@@ -122,23 +122,25 @@ class MassPlan(Base):
 
 
 # Fixed slot types for a Mass, matching the spec's field list.
-MASS_SLOT_TYPES = [
+DEFAULT_MASS_SLOTS = [
     "entrance_hymn",
     "penitential_rite",
-    "gloria",
-    "responsorial_psalm",
     "psalm_response",
-    "gospel_acclamation",
     "offertory_hymn",
-    "holy",
-    "memorial_acclamation",
-    "great_amen",
-    "lamb_of_god",
     "communion_hymn",
-    "meditation_hymn",
     "recessional_hymn",
 ]
 
+OPTIONAL_MASS_SLOTS = [
+    "gloria",
+    "psalm_response",
+    "gospel_acclamation",
+    "holy",
+    "proclaimation",
+    "great_amen",
+    "lamb_of_god",
+    "meditation_hymn",
+]
 
 class MassItem(Base):
     """One slot (entrance, gloria, communion, etc.) within a MassPlan."""
