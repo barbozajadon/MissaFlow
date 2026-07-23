@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("MissaFlow")
-        self.setWindowIcon(QIcon("C:/Users/Admin/Desktop/MissaFlow/assets/icons/app_icon.PNG"))
+        self.setWindowIcon(QIcon("assets/icons/app_icon.ico"))
 
         self.resize(1200, 780)
 
