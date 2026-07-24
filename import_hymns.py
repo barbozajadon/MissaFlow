@@ -5,11 +5,15 @@ from pptx import Presentation
 
 from database.database import get_session, init_db
 from database.models import Hymn
+from utils.resources import resource_path
 
 # -------------------------------------------------
 # Configuration
 # -------------------------------------------------
-PPT_PATH = "assets/Joyful Celebration Hymn Book.pptx"
+PPT_PATH = resource_path(
+    "assets",
+    "Joyful Celebration Hymn Book.pptx"
+)
 
 # Detects:
 # 39 - Amazing Grace

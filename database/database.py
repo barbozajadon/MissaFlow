@@ -20,7 +20,9 @@ from database.models import Base
 logger = logging.getLogger(__name__)
 
 # database.db lives at the project root, alongside app.py
-DB_PATH = Path(__file__).resolve().parent.parent / "database.db"
+from utils.resources import resource_path
+
+DB_PATH = resource_path("database.db")
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 # check_same_thread=False is required because PySide6 may touch the
@@ -54,5 +56,3 @@ def get_session() -> Generator[Session, None, None]:
         raise
     finally:
         session.close()
-
-print(DB_PATH)

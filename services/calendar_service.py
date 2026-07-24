@@ -51,7 +51,7 @@ def upsert_entry(
         if entry is None:
             entry = LiturgicalCalendar(date=mass_date, season=season or "Ordinary Time")
             session.add(entry)
-
+        entry.psalm_response_hymn_id = psalm_response_hymn_id
         if season is not None:
             entry.season = season
         if feast_name is not None:
@@ -76,6 +76,7 @@ def upsert_entry(
         session.commit()
         session.refresh(entry)
         return entry
+    
 
 
 def get_current_season(today: Optional[datetime.date] = None) -> str:

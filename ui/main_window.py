@@ -26,6 +26,7 @@ from ui.history_dialog import HistoryDialog
 from ui.planner_page import PlannerPage
 from ui.search_page import SearchPage
 from ui.settings_dialog import SettingsDialog
+from utils.resources import resource_path
 
 logger = logging.getLogger(__name__)
 
@@ -144,11 +145,13 @@ class MainWindow(QMainWindow):
         self.nav_list.setCurrentRow(PAGE_NAMES.index("Mass Planner"))
 
     # -- Theming ----------------------------------------------------------
-
     def _apply_theme(self, theme_name: str) -> None:
-        styles_dir = Path(__file__).resolve().parent.parent / "styles"
-        qss_path = styles_dir / f"{theme_name}.qss"
+        qss_path = resource_path("styles", f"{theme_name}.qss")
+
         if not qss_path.exists():
-            logger.warning("Theme file not found: %s", qss_path)
-            return
-        self.setStyleSheet(qss_path.read_text())
+           logger.warning("Theme file not found: %s", qss_path)
+           return
+
+        self.setStyleSheet(
+             qss_path.read_text(encoding="utf-8")
+      )

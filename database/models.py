@@ -92,6 +92,11 @@ class LiturgicalCalendar(Base):
 
     psalm_response_hymn: Mapped[Optional["Hymn"]] = relationship()
 
+    psalm_response_hymn_id: Mapped[Optional[int]] = mapped_column(
+    ForeignKey("hymns.id", ondelete="SET NULL"),
+    nullable=True
+)
+
 
 class MassPlan(Base):
     """A single planned Mass - the container for all its MassItems."""

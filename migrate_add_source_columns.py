@@ -20,7 +20,9 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parent / "database.db"
+from utils.resources import resource_path
+
+DB_PATH = resource_path("database.db")
 
 
 def column_exists(cursor: sqlite3.Cursor, table: str, column: str) -> bool:
